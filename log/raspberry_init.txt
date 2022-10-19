@@ -1,0 +1,92 @@
+Nach der Installation des ISO-Image können wichtige grundlegende Einstellungen über Kommandozeile mit dem Befehl raspi-config gemacht werden.
+Führt danach das Upgrade (es wird eine Internetverbindung vorausgesetzt) mit sudo-Rechte aus:
+   apt-get update (oder apt update)
+   apt-get upgrade
+
+Danach könnt ihr die notwendigen Pakete für die Dienste installieren:
+
+   apt-get install ... (oder apt install)
+
+   z.B. apt-get install python3-pip
+         apt-get install rpi.gpio
+
+
+NETZWERKKONFIGURATION
+
+Allgemeine Netzwerkeinstellungen in der Datei /etc/network/interfaces
+
+# Include files from /etc/network/interfaces.d:
+source-directory /etc/network/interfaces.d
+
+auto lo
+iface lo inet loopback
+
+# x und y müssen mit Zahlen ersetzt werden!!!
+auto eth0
+iface eth0 inet static
+          address 192.168.x.y
+          network 192.168.x.0
+          netmask 255.255.255.0
+          broadcast 192.168.x.255
+
+auto wlan0
+iface wlan0 inet dhcp
+#          wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+            pre-up wpa_supplicant -B -Dwext -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf
+            post-down killall -q wpa_supplicant
+
+
+Spezifische WLAN-Einstellungen in der Datei /etc/wpa_supplicant/wpa_supplicant.conf
+
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+country=IT
+
+network={
+          ssid="my_ssid"
+          psk="my_secret_psk"
+}
+
+network={
+          ssid="TFO-BZ"
+          scan_ssid=1
+          key_mgmt=WPA-EAP
+          pairwise=CCMP TKIP
+          group=CCMP TKIP
+          eap=PEAP
+          identity="myTFOBZusername"
+          password=hash:hashValueOfMyUserPassword
+          phase1="peapver=0"
+          phase2="MSCHAPV2"
+}
+
+
+Passphrase für WLAN-Einstellungen generieren:
+sudo wpa_passphrase mySSID mySecretPassword > wpa_temp.conf
+
+Um den hash-Wert für das User-Password zu generieren
+echo -n MySecretPassword | iconv -t utf16le | openssl md4
+(TIPP: Um Abschreibfehler beim Übertragen des Hashes in die Konfigurationsdatei zu vemeiden, kann man mit Pipe den Output des vorherigen Befehls nach "sudo tee -a /etc/wpa_supplicant/wpa_supplicant.conf" weiterleiten. Der Wert wird an das Dateiende angehängt und kann im Editor an den richtigen Ort bewegt werden)
+
+
+Eventuell könnte noch das Linux-Kommando "sudo rfkill unblock wlan" oder "sudo rfkill unblock all" notwendig sein.
+Starten und Beenden von Diensten (siehe auch https://wiki.ubuntuusers.de/Dienste/ und https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units-de)
+Verschiedene Möglichkeiten für das Starten von Diensten (z.B. den Netzwerkdienst):
+
+    service networking start
+    systemctl start networking.service
+
+Verschiedene Möglichkeiten für das Beenden von Diensten (z.B. den Netzwerkdienst):
+
+    service networking stop
+    systemctl stop networking.service
+
+Verschiedene Möglichkeiten für das Anzeigen des Status (z.B. für den Netzwerkdienst):
+
+    service networking status
+    systemctl status networking.service
+
+Eventuell könnte folgendes notwendig sein:
+
+    sudo ifdown wlan0
+    sudo ifup wlan0
