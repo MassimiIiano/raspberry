@@ -1,0 +1,4 @@
+connect via ssh through command:
+ssh toor@10.216.220.186
+
+and than entering the password
