@@ -7,12 +7,14 @@
 > It reduces bandwidth and improves response times by caching and reusing frequently-requested web pages
 
 ## Plane einen Proxy mit Squid für ein LAN (Dienste, Ziele). Starte dabei z.B. von der Situation: Ein Hotel stellt Internet über ein Kabel zur Verfügung, wir haben aber mindestens 2 Laptops und einen Switch. Verwende einen RPi als Proxy.
-> ### targets:
+### targets:
 > - allow guests of hotel to use webpages
+> - have a fast connection
+> - have a secure connection
 
 ### services
-
-
+> - firewall for seciurity
+> - squid for cashing and improved speeds
 
 ## Installiere den Dienst und teste ihn. Hast du Zugriff?
 ## Erlaube den Zugriff für genau einen PC.
