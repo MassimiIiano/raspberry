@@ -17,6 +17,14 @@ It reduces bandwidth and improves response times by caching and reusing frequent
 - squid for cashing and improved speeds
 
 ## Installiere den Dienst und teste ihn. Hast du Zugriff?
+### installation
+> problemas 
+```
+sudo apt update 
+sudo apt install squid -y
+```
+
+
 ## Erlaube den Zugriff für genau einen PC.
 ## Erlaube den Zugriff für ein gesamtes Netz.
 ## Definiere den Zugriff für die Zeitspanne von 10.25 Uhr bis 10.40 Uhr und von 14.30 Uhr bis 16.30 Uhr.
