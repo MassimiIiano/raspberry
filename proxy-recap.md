@@ -19,8 +19,9 @@ It reduces bandwidth and improves response times by caching and reusing frequent
 ## Installiere den Dienst und teste ihn. Hast du Zugriff?
 ### installation
 > wpa_supplicant makes chrush networking adn apt update dosn't work
-> try to write script in init.d
-> for that i have to install chkconfig
+
+> try to write script in init.d;
+> for that i have to install chkconfig;
 > that still dosn't work
 > write a service for systemctl to write defoult rules
 > as of now the service is stll failing, but at least i can install squid
