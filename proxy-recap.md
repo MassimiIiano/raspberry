@@ -7,7 +7,7 @@ Squid is a Unix-based proxy server that caches Internet content closer to a requ
 It reduces bandwidth and improves response times by caching and reusing frequently-requested web pages
 
 ## Plane einen Proxy mit Squid für ein LAN (Dienste, Ziele). Starte dabei z.B. von der Situation: Ein Hotel stellt Internet über ein Kabel zur Verfügung, wir haben aber mindestens 2 Laptops und einen Switch. Verwende einen RPi als Proxy.
-### targets:
+#### targets:
 - allow guests of hotel to use webpages
 - have a fast connection
 - have a secure connection
@@ -17,7 +17,7 @@ It reduces bandwidth and improves response times by caching and reusing frequent
 - squid for cashing and improved speeds
 
 ## Installiere den Dienst und teste ihn. Hast du Zugriff?
-### installation
+#### installation
 > wpa_supplicant makes chrush networking adn apt update dosn't work;
 > try to write script in init.d;
 > for that i have to install chkconfig;
@@ -28,13 +28,13 @@ It reduces bandwidth and improves response times by caching and reusing frequent
 sudo apt update 
 sudo apt install squid -y
 ```
-### enable and start
+#### enable and start
 ```
 sudo systemctl enable squid
 sudo systemctl start squid
 ```
 
-### test 
+#### test 
 ```
 telnet localhost 3128
 ```
