@@ -19,7 +19,7 @@ It reduces bandwidth and improves response times by caching and reusing frequent
 ## Installiere den Dienst und teste ihn. Hast du Zugriff?
 ### installation
 > wpa_supplicant makes chrush networking adn apt update dosn't work
-
+>
 > try to write script in init.d;
 > for that i have to install chkconfig;
 > that still dosn't work
