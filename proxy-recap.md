@@ -40,7 +40,15 @@ telnet localhost 3128
 ```
 
 ## Erlaube den Zugriff für genau einen PC.
+The defoult configuration allows acces to only one ip (localhost), you can replace it by breating an acs element for a new ip in the network and allow it in the **/etc/squid/squid.conf** file
+```
+acs newip src 11.22.33.44
+http_acces allow newip
+```
+
 ## Erlaube den Zugriff für ein gesamtes Netz.
+uncomment **http_acces allow localnet** at mor or les 16% of the  **/etc/squid/squid.conf** document.
+
 ## Definiere den Zugriff für die Zeitspanne von 10.25 Uhr bis 10.40 Uhr und von 14.30 Uhr bis 16.30 Uhr.
 ## Wähle weitere Einstellungsmöglichkeiten mit Squid und konfiguriere sie.
 ## Wie kannst Du Blacklists einstellen?
