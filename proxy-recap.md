@@ -73,7 +73,43 @@ http_access deny
 
 ## Wähle weitere Einstellungsmöglichkeiten mit Squid und konfiguriere sie.
 
-### Logging
+Cache-Management:
+
+```
+# Cache-Größe festlegen (in MB)
+cache_mem 128 MB
+
+# maximale Lebensdauer gecachter Inhalte festlegen (in Sekunden)
+maximum_object_size_in_memory 512 KB
+
+# Regeln für das Löschen von Inhalten aus dem Cache festlegen
+cache_replacement_policy heap GDSF
+```
+
+Authentifizierung:
+
+```
+# Authentifizierung aktivieren und eine spezifische Authentifizierungsmethode festlegen
+auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwd
+acl authenticated_users proxy_auth REQUIRED
+http_access allow authenticated_users
+```
+
+
+
+Zugriffskontrolle:
+```
+# Zugriff auf bestimmte Websites beschränken
+acl blocked_sites dstdomain "/etc/squid/blocked_sites.txt"
+http_access deny blocked_sites
+
+# Zugriff auf bestimmte IP-Adressen erlauben
+acl allowed_ips src "/etc/squid/allowed_ips.txt"
+http_access allow allowed_ips
+```
+
+Logging:
+
 ```
 # Log-Level festlegen
 log_level 3
@@ -83,6 +119,20 @@ log_format combined %>a %ui %un [%tl] "%rm %ru HTTP/%rv" %Hs %<st "%{Referer}>h"
 
 # Log-Datei festlegen
 access_log /var/log/squid/access.log combined
+```
+
+
+Netzwerkeinstellungen:
+
+```
+# Transparent-Proxy konfigurieren
+http_port 3128 transparent
+
+# Reverse-Proxy konfigurieren
+cache_peer example.com parent 80 0 no-query default
+
+# Interception-Proxy konfigurieren
+http_port 8080 intercept
 ```
 
 
