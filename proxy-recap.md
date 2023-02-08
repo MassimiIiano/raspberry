@@ -1,4 +1,4 @@
-# Proxy recap
+# Proxy recap   x
 
 ## Was ist Squid?
 Squid is a Unix-based proxy server that caches Internet content closer to a requestor than its original point of origin.
@@ -7,7 +7,7 @@ Squid is a Unix-based proxy server that caches Internet content closer to a requ
 It reduces bandwidth and improves response times by caching and reusing frequently-requested web pages
 
 ## Plane einen Proxy mit Squid für ein LAN (Dienste, Ziele). Starte dabei z.B. von der Situation: Ein Hotel stellt Internet über ein Kabel zur Verfügung, wir haben aber mindestens 2 Laptops und einen Switch. Verwende einen RPi als Proxy.
-#### targets:
+### targets:
 - allow guests of hotel to use webpages
 - have a fast connection
 - have a secure connection
@@ -18,20 +18,20 @@ It reduces bandwidth and improves response times by caching and reusing frequent
 
 ## Installiere den Dienst und teste ihn. Hast du Zugriff?
 
-#### installation
+### installation
 
 ```
 sudo apt update 
 sudo apt install squid -y
 ```
-#### enable and start
+### enable and start
 
 ```
 sudo systemctl enable squid
 sudo systemctl start squid
 ```
 
-#### test 
+### test 
 
 ```
 telnet localhost 3128
@@ -73,7 +73,7 @@ http_access deny
 
 ## Wähle weitere Einstellungsmöglichkeiten mit Squid und konfiguriere sie.
 
-Cache-Management:
+### Cache-Management:
 
 ```
 # Cache-Größe festlegen (in MB)
@@ -86,7 +86,7 @@ maximum_object_size_in_memory 512 KB
 cache_replacement_policy heap GDSF
 ```
 
-Authentifizierung:
+### Authentifizierung:
 
 ```
 # Authentifizierung aktivieren und eine spezifische Authentifizierungsmethode festlegen
@@ -95,9 +95,8 @@ acl authenticated_users proxy_auth REQUIRED
 http_access allow authenticated_users
 ```
 
+### Zugriffskontrolle:
 
-
-Zugriffskontrolle:
 ```
 # Zugriff auf bestimmte Websites beschränken
 acl blocked_sites dstdomain "/etc/squid/blocked_sites.txt"
@@ -108,7 +107,7 @@ acl allowed_ips src "/etc/squid/allowed_ips.txt"
 http_access allow allowed_ips
 ```
 
-Logging:
+### Logging:
 
 ```
 # Log-Level festlegen
@@ -121,8 +120,7 @@ log_format combined %>a %ui %un [%tl] "%rm %ru HTTP/%rv" %Hs %<st "%{Referer}>h"
 access_log /var/log/squid/access.log combined
 ```
 
-
-Netzwerkeinstellungen:
+### Netzwerkeinstellungen:
 
 ```
 # Transparent-Proxy konfigurieren
