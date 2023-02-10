@@ -1,20 +1,40 @@
 # Proxy recap
 
 ## Was ist Squid?
-Squid is a Unix-based proxy server that caches Internet content closer to a requestor than its original point of origin.
+Squid is an open-source proxy server software that is used for managing network traffic. It acts as an intermediary between client devices and the internet. Squid provides a range of features and functionalities that allow administrators to control and manage internet access for the devices on their network, improve network performance, enhance security, and monitor network traffic and usage patterns. 
 
 ## Was kann Squid?
-It reduces bandwidth and improves response times by caching and reusing frequently-requested web pages
+- Intermediary between client devices and the internet
+- Control and management of internet access for network devices
+- Caching of frequently accessed websites for improved network performance
+- Restrictions on internet usage, such as limiting access to certain websites or times
+- Security features, such as a firewall, to prevent malicious traffic
+- Flexible configuration and ability to integrate with other network services
+- Effective for managing network traffic in small and large networks.
 
 ## Plane einen Proxy mit Squid für ein LAN (Dienste, Ziele). Starte dabei z.B. von der Situation: Ein Hotel stellt Internet über ein Kabel zur Verfügung, wir haben aber mindestens 2 Laptops und einen Switch. Verwende einen RPi als Proxy.
-### Targets:
-- allow guests of hotel to use webpages
-- have a fast connection
-- have a secure connection
 
-### Services
-- firewall for seciurity
-- squid for cashing and improved speeds
+### Services:
+- Squid proxy server
+- DHCP server (for assigning IP addresses to devices in the LAN)
+- Firewall (for security purposes)
+- Network address translation (NAT)
+
+### Goals:
+- Provide internet access to multiple devices in the LAN
+- Control and manage the internet usage of devices in the LAN
+- Secure the LAN by filtering unwanted or malicious traffic
+- Optimize network performance by caching frequently accessed websites
+- Monitor network traffic and usage patterns
+
+### Approach
+- Set up the Raspberry Pi as the central device in the LAN and install the necessary services such as Squid, DHCP, firewall, and NAT.
+- Configure the Squid proxy server to listen on a specific port and allow incoming connections from the LAN.
+- Set up the firewall to restrict incoming and outgoing traffic based on predefined rules.
+- Configure the DHCP server to assign IP addresses to devices in the LAN dynamically.
+- Enable NAT to allow devices in the LAN to access the internet via the Raspberry Pi.
+- Test the setup to ensure that the devices in the LAN can access the internet via the Squid proxy.
+- Monitor the network traffic and usage patterns to fine-tune the configuration and ensure that the goals are being met.
 
 ## Installiere den Dienst und teste ihn. Hast du Zugriff?
 
