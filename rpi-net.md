@@ -7,7 +7,7 @@ Jede Gruppe schließt ihren RPi an das LAN des Systeme-Labors (= RPi-Netz) an un
 
 <h5 a><strong><code>/etc/network/interfaces</code></strong></h5>
 
-```
+```bash
 auto eth0
 iface eth0 inet static
     address 10.0.0.6/24
@@ -31,7 +31,7 @@ Der RPi selbst und ein angeschlossener Laptop erhalten jeweils eine IP in diesem
 
 <h5 a><strong><code>/etc/network/interfaces</code></strong></h5>
 
-```
+```bash
 auto wlan0
 iface wlan0 inet static
     address 192.168.1.1
@@ -46,7 +46,7 @@ Hier kann man wiederum mit `ip a` schauen, ob das Interface richtig gesetzt wurd
 
 <h5 a><strong><code>/etc/hostapd/hostapd.conf</code></strong></h5>
 
-```
+```bash
 interface=wlan0 # das interface
 driver=nl80211 
 ssid=Raspberry_6
@@ -90,15 +90,65 @@ Sobald diese Schritte abgeschlossen sind, sollte das Gerät auf wlan0 in der Lag
 ## PAT (Masuerading)
 Konfiguriert als erste Lösung für das obige Problem PAT (Masquerading). Testet und dokumentiert.
 
-??
+?? Überprüfen:
+
+Ohne NAT (Network Address Translation) oder PAT (Port Address Translation) können Geräte in einem privaten Netzwerk nicht direkt mit Geräten in einem anderen Netzwerk kommunizieren. Dies liegt daran, dass private IP-Adressen nicht im Internet geroutet werden können. Um die Kommunikation zwischen den beiden Netzwerken zu ermöglichen, muss der Verkehr von einem privaten Netzwerk zu einem anderen über ein Gateway geleitet werden, das NAT oder PAT verwendet.
+
+In Ihrem Fall ist der Raspberry Pi das Gateway zwischen dem lokalen Netzwerk und dem RPiNet. Ohne NAT oder PAT auf dem Raspberry Pi können Geräte im lokalen Netzwerk nicht direkt mit Geräten im RPiNet kommunizieren. Durch die Konfiguration von NAT oder PAT auf dem Raspberry Pi wird der Verkehr von einem privaten Netzwerk zum anderen umgeschrieben, so dass die Kommunikation möglich wird.
+
+Man kann dieses Problem lösen, indem man mit NAT beziehungsweise mit PAT arbeitet.
+
+Dazu muss man die iptables-Regeln auf dem Raspberry Pi konfigurierern, um den Verkehr von wlan0 (lokales Netzwerk) zu eth0 (RPiNet) zu NATen (PATen):
+
+```bash
+sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+sudo iptables -A FORWARD -i eth0 -o wlan0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A FORWARD -i wlan0 -o eth0 -j ACCEPT
+```
+
+Es wird hier also durch `MASQUERADE` dynamisches NAT (beziehungsweise PAT) benutzt.
+
+Nachdem diese Schritte abgeschlossen wurden, sollte der Laptop im lokalen Netzwerk des Raspberry Pi in der Lage sein, über den Raspberry Pi auf das RPiNet zuzugreifen.
 
 ## NAT 
 Über NAT (nicht PAT) wird nun den privaten IPs (RPi und Laptop) jeweils eine weitere öffentliche IP "zugeteilt". Diese IPs haben den Prefix y.0.0.0/24 (y = 10 + ID der Gruppe).
 Versucht nun erneut, vom internen Netz aus die Webseite der anderen Gruppen zu erreichen. Wieder werdet ihr merken, dass es nicht auf Anhieb funktioniert - denkt an die Rückroute der Pakete! Testet und dokumentiert. Versucht, sowohl statisches als auch dynamisches NAT zu konfigurieren!
 
-??
+?? Überprüfen:
+
+Dazu muss man wie im obigen Problem auch schon erläutert die iptables-Regeln auf dem Raspberry Pi konfigurieren und NAT hinzufügen. 
+
+Hier ist die Lösung mit statischem NAT:
+
+```bash
+sudo iptables -t nat -A PREROUTING -d y.0.0.0/24 -j DNAT --to-destination 192.168.1.x
+sudo iptables -t nat -A POSTROUTING -s 192.168.1.x -j SNAT --to-source y.0.0.0
+```
+
+Die Rückroute muss ebenfalls konfiguriert werden, damit Antworten von Geräten im RPiNet zurück zum lokalen Netzwerk geleitet werden können. Dies geschieht durch die Konfiguration von iptables-Regeln auf dem Raspberry Pi, die den Verkehr von eth0 (RPiNet) zu wlan0 (lokales Netzwerk) umschreiben.
+
+Dabei ist y 16 (10 + ID der Gruppe) und x die die IP-Adresse des Geräts im lokalen Netzwerk.
 
 ## Spezieller Dienst
 Konfiguriert nun in eurem privaten Netz (auf dem privaten Interface des RPi oder auf dem Laptop) einen weiteren Dienst (z.B. FTP). Dieser Dienst soll ausschließlich über eure öffentliche Gruppen-IP (y.0.0.0/24) erreichbar sein.
 
-??
+?? Überprüfen + umschreiben
+
+Um einen FTP-Dienst in Ihrem privaten Netzwerk zu konfigurieren und ihn ausschließlich über Ihre öffentliche Gruppen-IP erreichbar zu machen, können Sie die folgenden Schritte ausführen:
+
+Installieren Sie einen FTP-Server auf dem Raspberry Pi oder dem Laptop in Ihrem privaten Netzwerk. Hier ist ein Beispiel, wie Sie den vsftpd-Server auf dem Raspberry Pi installieren können:
+sudo apt-get update
+
+sudo apt-get install vsftpd
+
+Konfigurieren Sie den FTP-Server gemäß Ihren Anforderungen. Die Konfigurationsdatei für vsftpd befindet sich normalerweise unter /etc/vsftpd.conf.
+
+Stellen Sie sicher, dass der FTP-Server gestartet ist und ordnungsgemäß funktioniert.
+
+Konfigurieren Sie die iptables-Regeln auf dem Raspberry Pi, um den FTP-Verkehr von Ihrer öffentlichen Gruppen-IP (y.0.0.0/24) zu Ihrer privaten IP-Adresse umzuleiten:
+
+sudo iptables -t nat -A PREROUTING -p tcp -d y.0.0.0/24 --dport 21 -j DNAT --to-destination 192.168.1.x:21
+
+Ersetzen Sie y durch 10 + ID der Gruppe und x durch die IP-Adresse des Geräts im privaten Netzwerk, auf dem der FTP-Server ausgeführt wird.
+
+Nachdem Sie diese Schritte abgeschlossen haben, sollte der FTP-Dienst ausschließlich über Ihre öffentliche Gruppen-IP erreichbar sein.
