@@ -111,6 +111,8 @@ Somit wird alles, was von eth0 nach wlan0 weitergeleitet werden soll gedroppt.
 ## Aufgabenstellung Routing
 Konfiguriert den RPi so, dass er für den Laptop als Gateway zum RPi-Netz arbeitet. Versucht nun vom Laptop aus auf die Webserver (RPi) der anderen Gruppen zuzugreifen - ihr werdet sehen, dass dies trotz des Gateways nicht möglich ist. Findet heraus warum, und dokumentiert!
 
+Siehe oben
+
 ## PAT (Masuerading)
 Konfiguriert als erste Lösung für das obige Problem PAT (Masquerading). Testet und dokumentiert.
 
