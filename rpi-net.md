@@ -1,4 +1,4 @@
-# RPi-
+# RPi - Networking
 
 ## Aufgabenstellung Öffentliches Interface
 Jede Gruppe schließt ihren RPi an das LAN des Systeme-Labors (= RPi-Netz) an und vergibt diesem "öffentlichen" Interface die IP 10.0.0.x/24 (wobei x der ID der Gruppe bzw. der RPI-Nummer entspricht; die Gruppen gehen von 1 bis 7). Der Webserver jedes RPis soll über diese öffentliche IP erreichbar sein.
