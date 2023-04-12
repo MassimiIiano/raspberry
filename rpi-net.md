@@ -199,7 +199,8 @@ Dabei ist y 16 (10 + ID der Gruppe) und x die die IP-Adresse des Geräts im loka
 
 ---
 ## Spezieller Dienst
-Konfiguriert nun in eurem privaten Netz (auf dem privaten Interface des RPi oder auf dem Laptop) einen weiteren Dienst (z.B. FTP). Dieser Dienst soll ausschließlich über eure öffentliche Gruppen-IP (y.0.0.0/24) erreichbar sein.
+
+> Konfiguriert nun in eurem privaten Netz (auf dem privaten Interface des RPi oder auf dem Laptop) einen weiteren Dienst (z.B. FTP). Dieser Dienst soll ausschließlich über eure öffentliche Gruppen-IP (y.0.0.0/24) erreichbar sein.
 
 Um einen FTP-Dienst in einem privaten Netzwerk zu konfigurieren und ihn ausschließlich über eine öffentliche Gruppen-IP erreichbar zu machen, kann man die folgenden Schritte ausführen:
 
