@@ -1,7 +1,7 @@
 # RPi - Networking
 ---
 ## Aufgabenstellung Öffentliches Interface
-Jede Gruppe schließt ihren RPi an das LAN des Systeme-Labors (= RPi-Netz) an und vergibt diesem "öffentlichen" Interface die IP 10.0.0.x/24 (wobei x der ID der Gruppe bzw. der RPI-Nummer entspricht; die Gruppen gehen von 1 bis 7). Der Webserver jedes RPis soll über diese öffentliche IP erreichbar sein.
+Jede Gruppe schließt ihren RPi an das LAN des Systeme-Labors (= RPi-Netz) an und vergibt diesem "öffentlichen" Interface die IP 10.0.0.x/24 (unsere gruppe hat die Addresse 10.0.0.6 ). Der Webserver jedes RPis soll über diese öffentliche IP erreichbar sein.
 
 1. Um eine statische IP-Addresse zu bekommen muss man folgende Datei bearbeiten:
 
@@ -16,11 +16,12 @@ iface eth0 inet static
     broadcast 10.0.0.255
 ```
 
-Dabei muss geschaut werden, dass der ==networking.service== läuft und der dhcpcd.service nicht die IP-Adressen überschreibt. Mit dem Command `ip a` kann man nachschauen, ob die IP-Adresse richtig vergeben wurde und ob das Interface auch aktiv ist.  
+Dabei muss geachted werden, dass der networking.service läuft und der dhcpcd.service nicht die IP-Adressen überschreibt. Mit dem Command `ip a` kann man nachschauen, ob die IP-Adresse richtig vergeben wurde und ob das Interface auch aktiv ist.  
 
 Es ist jedoch wichtig zu beachten, dass diese Methode für neuere Versionen von Debian/Raspbian (ab Version 9 Stretch) nicht mehr empfohlen wird. Stattdessen wird das Programm dhcpcd verwendet, um eine statische IP-Adresse zu konfigurieren. Weitere Informationen dazu finden Sie in der offiziellen Dokumentation von Raspbian: https://www.raspberrypi.org/documentation/configuration/tcpip/, dies ist auch in der verwendeten Version möglich. 
 
 Dabei muss man folgende Datei konfigurieren:
+
 <h5 a><strong><code>/etc/dhcpcd.conf</code></strong></h5>
 
 ```bash
@@ -28,11 +29,10 @@ interface eth0
 static ip_address=10.0.0.6/24
 ...
 ```
+2. Reboot
+3. Anschließend muss man kontrollieren ob der Prozess erfolgreich war. Mit dem ping Befehl kann man bestätigen, dass das Interface eth0 aktiv ist und man sich im RPi-Netz befindet.
 
-2. Dann kann mit ping ein anderer Raspberry gepingt werden und man sieht, dass das Interface eth0 aktiv ist und man sich im RPi-Netz befindet.
-
-Zusätzlich sollte geschaut werden, ob die Firewalleinstellungen von iptables nicht das RPI-net verweigert, denn wenn iptables das RPI-net verweigert kann ein anderer Raspberry im RPI-net nicht den eigenen Raspberry erreichen. Man kann mit `sudo iptables -F && sudo iptables -P INPUT ACCEPT` für die jetzige Session am Raspberry den ganzen Eingang aktzeptieren. Dann kann man auch testen, ob ein anderer Raspberry den eigenen erreichen kann, aber man sollte die Firewalleinstellungen selbst so anpassen, wie sie gewollt sein, damit auch das Interface so funktioniert, wie es funktionieren soll - und das sicherheitsstechnisch in Ordnung. Der vorherig genannte Command ist also nur für Testzwecke in der jeweiligen Session gut. Um das sicher und über Sessions unabhängig zu konfigurieren, kann man, wenn man den folgenden iptables Befehl zu der Konfiguration hinzufügt:
-`sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT` Diese Regel öffnet den Port 80 für eingehende TCP-Verbindungen.
+Zusätzlich sollte festgestellt werden, ob die Firewalleinstellungen von iptables nicht das RPI-net verweigert. Dies könnte dazu führen, dass die verbindung zu anderen mitgleider des RPI-net verweigert wird. Man kann mit `sudo iptables -F && sudo iptables -P INPUT ACCEPT` für die jetzige Session am Raspberry den ganzen Eingang aktzeptieren. Anschließend testent man, ob ein anderer Raspberry den eigenen erreichen kann. Sicherheitshalber sollte man ie Firewalleinstellungen selbst anpassen, um die korekte und sichere Funktionsweise des Interface zu Garantieren. Der vorherig genannte Command ist also nur für Testzwecke in der jeweiligen Session gut. Um das sicher und über Sessions unabhängig zu konfigurieren, kann man, wenn man den folgenden iptables Befehl zu der Konfiguration hinzufügt: \\ `sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT` Diese Regel öffnet den Port 80 für eingehende TCP-Verbindungen.
 
 Es sollte jedoch beachtet werden, dass neuere Versionen von Raspbian standardmäßig die Firewall ufw verwenden. Daher ist es ratsam, ufw zu konfigurieren, um sicherzustellen, dass der Webserver des RPi über das öffentliche Interface erreichbar ist. Weitere Informationen dazu finden Sie in der offiziellen Dokumentation von Raspbian: https://www.raspberrypi.org/documentation/configuration/security-firewall.md, diese Konfiguration war in dieser Version jedoch nicht notwendig.
 
