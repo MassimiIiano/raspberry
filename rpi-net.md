@@ -1,5 +1,5 @@
 # RPi - Networking
-
+---
 ## Aufgabenstellung Öffentliches Interface
 Jede Gruppe schließt ihren RPi an das LAN des Systeme-Labors (= RPi-Netz) an und vergibt diesem "öffentlichen" Interface die IP 10.0.0.x/24 (wobei x der ID der Gruppe bzw. der RPI-Nummer entspricht; die Gruppen gehen von 1 bis 7). Der Webserver jedes RPis soll über diese öffentliche IP erreichbar sein.
 
@@ -48,6 +48,7 @@ Listen 10.0.0.6
 
 4. Der Apache muss dann gestartet werden mit: `sudo systemctl start apache2`. Läuft der Apache schon, kann man das mit `sudo systemctl status apache2` kontrollieren.
 
+---
 ## Aufgabenstellung Privates Netz
 Der RPi erhält dann per WLAN-AccessPoint (oder USB/Ethernet Adapter) ein zweites, "privates" Interface, auf dem ein Netz aus dem Bereich 172.16.0.0/12 oder 192.168.0.0/16 konfiguriert wird.
 Der RPi selbst und ein angeschlossener Laptop erhalten jeweils eine IP in diesem Netz. Dieses private Netz soll nicht von außen erreichbar sein.
@@ -108,11 +109,13 @@ Wenn die Applikation ohne Fehler läuft, dann kann man sich mit einem Gerät, zu
 
 Somit wird alles, was von eth0 nach wlan0 weitergeleitet werden soll gedroppt. 
 
+---
 ## Aufgabenstellung Routing
 Konfiguriert den RPi so, dass er für den Laptop als Gateway zum RPi-Netz arbeitet. Versucht nun vom Laptop aus auf die Webserver (RPi) der anderen Gruppen zuzugreifen - ihr werdet sehen, dass dies trotz des Gateways nicht möglich ist. Findet heraus warum, und dokumentiert!
 
 Siehe oben
 
+---
 ## PAT (Masuerading)
 Konfiguriert als erste Lösung für das obige Problem PAT (Masquerading). Testet und dokumentiert.
 
@@ -146,6 +149,7 @@ Es ist wichtig zu beachten, dass die Konfiguration von NAT eine potenzielle Sich
 
 Nachdem diese Schritte abgeschlossen wurden, sollte der Laptop im lokalen Netzwerk des Raspberry Pi in der Lage sein, über den Raspberry Pi auf das RPiNet zuzugreifen.
 
+---
 ## NAT 
 Über NAT (nicht PAT) wird nun den privaten IPs (RPi und Laptop) jeweils eine weitere öffentliche IP "zugeteilt". Diese IPs haben den Prefix y.0.0.0/24 (y = 10 + ID der Gruppe).
 Versucht nun erneut, vom internen Netz aus die Webseite der anderen Gruppen zu erreichen. Wieder werdet ihr merken, dass es nicht auf Anhieb funktioniert - denkt an die Rückroute der Pakete! Testet und dokumentiert. Versucht, sowohl statisches als auch dynamisches NAT zu konfigurieren!
@@ -169,6 +173,7 @@ Die Rückroute muss ebenfalls konfiguriert werden, damit Antworten von Geräten 
 
 Dabei ist y 16 (10 + ID der Gruppe) und x die die IP-Adresse des Geräts im lokalen Netzwerk.
 
+---
 ## Spezieller Dienst
 Konfiguriert nun in eurem privaten Netz (auf dem privaten Interface des RPi oder auf dem Laptop) einen weiteren Dienst (z.B. FTP). Dieser Dienst soll ausschließlich über eure öffentliche Gruppen-IP (y.0.0.0/24) erreichbar sein.
 
