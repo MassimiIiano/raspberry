@@ -1,9 +1,11 @@
 # RPi - Networking
 ---
 ## Aufgabenstellung Öffentliches Interface
-Jede Gruppe schließt ihren RPi an das LAN des Systeme-Labors (= RPi-Netz) an und vergibt diesem "öffentlichen" Interface die IP 10.0.0.x/24 (unsere gruppe hat die Addresse 10.0.0.6 ). Der Webserver jedes RPis soll über diese öffentliche IP erreichbar sein.
 
-1. Um eine statische IP-Addresse zu bekommen muss man folgende Datei bearbeiten:
+>Jede Gruppe schließt ihren RPi an das LAN des Systeme-Labors (= RPi-Netz) an und vergibt diesem "öffentlichen" Interface die IP 10.0.0.x/24 (unsere gruppe hat die Addresse 10.0.0.6 ). Der Webserver jedes RPis soll über diese öffentliche IP erreichbar sein.
+
+### 1. ip vergeben
+Um eine statische IP-Addresse zu bekommen muss man folgende Datei bearbeiten:
 
 <h5 a><strong><code>/etc/network/interfaces</code></strong></h5>
 
@@ -29,16 +31,20 @@ interface eth0
 static ip_address=10.0.0.6/24
 ...
 ```
-2. Reboot
-3. Anschließend muss man kontrollieren ob der Prozess erfolgreich war. Mit dem ping Befehl kann man bestätigen, dass das Interface eth0 aktiv ist und man sich im RPi-Netz befindet.
 
-Zusätzlich sollte festgestellt werden, ob die Firewalleinstellungen von iptables nicht das RPI-net verweigert. Dies könnte dazu führen, dass die verbindung zu anderen mitgleider des RPI-net verweigert wird. Man kann mit `sudo iptables -F && sudo iptables -P INPUT ACCEPT` für die jetzige Session am Raspberry den ganzen Eingang aktzeptieren. Anschließend testent man, ob ein anderer Raspberry den eigenen erreichen kann. Sicherheitshalber sollte man ie Firewalleinstellungen selbst anpassen, um die korekte und sichere Funktionsweise des Interface zu Garantieren. Der vorherig genannte Command ist also nur für Testzwecke in der jeweiligen Session gut. Um das sicher und über Sessions unabhängig zu konfigurieren, kann man, wenn man den folgenden iptables Befehl zu der Konfiguration hinzufügt: \\ `sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT` Diese Regel öffnet den Port 80 für eingehende TCP-Verbindungen.
+### 2. Kontrolle und probleme
+
+Anschließend muss man kontrollieren ob der Prozess erfolgreich war. Mit dem ping Befehl kann man bestätigen, dass das Interface eth0 aktiv ist und man sich im RPi-Netz befindet.
+
+Zusätzlich sollte festgestellt werden, ob die Firewalleinstellungen von iptables nicht das RPI-net verweigert. Dies könnte dazu führen, dass die verbindung zu anderen mitgleider des RPI-net verweigert wird. Man kann mit `sudo iptables -F && sudo iptables -P INPUT ACCEPT` für die jetzige Session am Raspberry den ganzen Eingang aktzeptieren. Anschließend testent man, ob ein anderer Raspberry den eigenen erreichen kann. Sicherheitshalber sollte man ie Firewalleinstellungen selbst anpassen, um die korekte und sichere Funktionsweise des Interface zu Garantieren. Der vorherig genannte Command ist also nur für Testzwecke in der jeweiligen Session gut. Um das sicher und über Sessions unabhängig zu konfigurieren, kann man, wenn man den folgenden iptables Befehl zu der Konfiguration hinzufügt:  `sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT` Diese Regel öffnet den Port 80 für eingehende TCP-Verbindungen.
 
 Es sollte jedoch beachtet werden, dass neuere Versionen von Raspbian standardmäßig die Firewall ufw verwenden. Daher ist es ratsam, ufw zu konfigurieren, um sicherzustellen, dass der Webserver des RPi über das öffentliche Interface erreichbar ist. Weitere Informationen dazu finden Sie in der offiziellen Dokumentation von Raspbian: https://www.raspberrypi.org/documentation/configuration/security-firewall.md, diese Konfiguration war in dieser Version jedoch nicht notwendig.
 
 Schließlich sollte beachtet werden, dass es für den Betrieb eines Webservers auf einem RPi empfehlenswert ist, SSL (Secure Sockets Layer) zu aktivieren, um die Verbindung zwischen dem Client und dem Server zu verschlüsseln. Dies kann durch die Installation von certbot und die Konfiguration von nginx als Reverse Proxy erreicht werden. Weitere Informationen dazu finden Sie in der offiziellen Dokumentation von Raspbian: https://www.raspberrypi.org/documentation/remote-access/web-server/nginx.md, dies wurde jedoch nicht vervollständigt.
 
-3. Dann muss der Apache konfiguriert werden, damit er auch über die öffentliche IP-Adresse erreichbar ist. Hierzu muss die entsprechende Konfigurationsdatei bearbeitet werden:
+### 3. Apache
+
+Dann muss der Apache konfiguriert werden, damit er auch über die öffentliche IP-Adresse erreichbar ist. Hierzu muss die entsprechende Konfigurationsdatei bearbeitet werden:
 
 <h5 a><strong><code>/etc/apache2/apache2.conf</code></strong></h5>
 
@@ -50,11 +56,15 @@ Listen 10.0.0.6
 
 ---
 ## Aufgabenstellung Privates Netz
-Der RPi erhält dann per WLAN-AccessPoint (oder USB/Ethernet Adapter) ein zweites, "privates" Interface, auf dem ein Netz aus dem Bereich 172.16.0.0/12 oder 192.168.0.0/16 konfiguriert wird.
-Der RPi selbst und ein angeschlossener Laptop erhalten jeweils eine IP in diesem Netz. Dieses private Netz soll nicht von außen erreichbar sein.
 
-1. hostapd mittels `sudo apt install hostapd` installieren.
-2. Um ein privates Netz auf dem Interface wlan0 laufen zu lassen muss folgende Datei bearbeitet werden: 
+> Der RPi erhält dann per WLAN-AccessPoint (oder USB/Ethernet Adapter) ein zweites, "privates" Interface, auf dem ein Netz aus dem Bereich 172.16.0.0/12 oder 192.168.0.0/16 konfiguriert wird. Der RPi selbst und ein angeschlossener Laptop erhalten jeweils eine IP in diesem Netz. Dieses private Netz soll nicht von außen erreichbar sein.
+
+### 1. hostapd installieren 
+
+hostapd mittels `sudo apt install hostapd` installieren.
+
+### 2. wlan0 interface
+Um ein privates Netz auf dem Interface wlan0 laufen zu lassen muss folgende Datei bearbeitet werden: 
 
 <h5 a><strong><code>/etc/network/interfaces</code></strong></h5>
 
@@ -69,7 +79,8 @@ iface wlan0 inet static
 
 Hier kann man wiederum mit `ip a` schauen, ob das Interface richtig gesetzt wurde. Genau wie die Firewalleinstellungen und die Prozesse, welche eventuell interferieren müssen überprüft werden (genau wie bei der vorherigen Übung).
 
-3. Dann muss die Konfigurationsdatei von hostapd bearbeitet werden:
+### 3. hostapd konfigurieren
+Dann muss die Konfigurationsdatei von hostapd bearbeitet werden:
 
 <h5 a><strong><code>/etc/hostapd/hostapd.conf</code></strong></h5>
 
@@ -89,21 +100,26 @@ wpa_pairwise=TKIP
 rsn_pairwise=CCMP   
 ```
 
-4. Dann muss man mit `sudo /sbin/hostapd /etc/hostapd/hostapd.conf` den hostapd ausführen. 
+### 4. hostapd starten
+Dann muss man mit `sudo /sbin/hostapd /etc/hostapd/hostapd.conf` den hostapd ausführen. 
 
 Wenn die Applikation ohne Fehler läuft, dann kann man sich mit einem Gerät, zum Beispiel dem Laptop aber auch mit dem Smartphone sich mit dem Raspberry verbinden. Man muss aber wieder aufpassen und eine statische Konfiguration auszuwählen, um sich auch mit dem Raspberry verbinden zu können, da hostapd nicht einen DHCP-Server enthält (zumindest die verwendete Version (2.9), neuere Versionen eventuell haben einen DHCP-Server). Hat man sich dann verbunden, kann man innerhalb des Netzes 192.168.1.1 agieren. So kann man auch zwei Geäte mit dem AP verbinden und sich gegenseitig pingen.
 
-5. Möchte man jedoch trotzdem einen eigenen DHCP-Server einrichten, so kann man das folgendermaßen tun:
-    1. Man muss das Programm dnsmasq installieren: `sudo apt install dnsmasq`
-    2. Die Konfigurationsdatei `/etc/dnsmasq.conf` bearbeiten:
-            ```bash
-            interface=wlan0
-            dhcp-range=192.168.1.100,192.168.1.200,255.255.255.0,12h
-            ```
-        Somit gibt es jetzt auf dem Interface einen DHCP-Server, um Adressen im Bereich von 192.168.1.100 bis 192.168.1.200 mit einer Lease-Zeit von 12 Stunden zu vergeben.
-    3. Dann muss dnsmasq gestartet werden mit: `sudo systemctl start dnsmasq`
+### 5. dnsmasq
 
-6. Damit das private Netz nicht von außen erreichbar ist (also vom Netz auf eth0 - dem "Internet") muss folgende iptables-Regel definiert werden:
+Möchte man jedoch trotzdem einen eigenen DHCP-Server einrichten, so kann man das folgendermaßen tun:
+1. Man muss das Programm dnsmasq installieren: `sudo apt install dnsmasq`
+2. Die Konfigurationsdatei `/etc/dnsmasq.conf` bearbeiten:
+    ```bash
+    interface=wlan0
+    dhcp-range=192.168.1.100,192.168.1.200,255.255.255.0,12h
+    ```
+    Somit gibt es jetzt auf dem Interface einen DHCP-Server, um Adressen im Bereich von 192.168.1.100 bis 192.168.1.200 mit einer Lease-Zeit von 12 Stunden zu vergeben.
+3. Dann muss dnsmasq gestartet werden mit: `sudo systemctl start dnsmasq`
+
+### 6. Netz isolieren
+
+Damit das private Netz nicht von außen erreichbar ist (also vom Netz auf eth0 - dem "Internet") muss folgende iptables-Regel definiert werden:
 
 `sudo iptables -A FORWARD -i eth0 -o wlan0 -j DROP`
 
@@ -111,21 +127,26 @@ Somit wird alles, was von eth0 nach wlan0 weitergeleitet werden soll gedroppt.
 
 ---
 ## Aufgabenstellung Routing
-Konfiguriert den RPi so, dass er für den Laptop als Gateway zum RPi-Netz arbeitet. Versucht nun vom Laptop aus auf die Webserver (RPi) der anderen Gruppen zuzugreifen - ihr werdet sehen, dass dies trotz des Gateways nicht möglich ist. Findet heraus warum, und dokumentiert!
+> Konfiguriert den RPi so, dass er für den Laptop als Gateway zum RPi-Netz arbeitet. Versucht nun vom Laptop aus auf die Webserver (RPi) der anderen Gruppen zuzugreifen - ihr werdet sehen, dass dies trotz des Gateways nicht möglich ist. Findet heraus warum, und dokumentiert!
 
 Siehe oben
 
 ---
 ## PAT (Masuerading)
-Konfiguriert als erste Lösung für das obige Problem PAT (Masquerading). Testet und dokumentiert.
 
-1. Zuerst muss man sicherstellen, dass die IPv4-Weiterleitung aktiviert ist. Das kann man tun, indem man den folgenden Befehl ausführt:
+> Konfiguriert als erste Lösung für das obige Problem PAT (Masquerading). Testet und dokumentiert.
+
+### 1. IP-Forwarding aktivieren 
+
+Zuerst muss man sicherstellen, dass die IPv4-Weiterleitung aktiviert ist. Das kann man tun, indem man den folgenden Befehl ausführt:
 
 `echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward`
 
 Man sollte außerdem sicherstellen, dass keine iptables-Regeln den Verkehr von wlan0 zu eth0 blockieren.
 
-2. Auf dem Gerät, das mit wlan0 verbunden ist, muss man dann die IP-Adresse des Raspberry Pi auf wlan0 als Standard-Gateway festlegen. Dies kann in den Netzwerkeinstellungen des Geräts erfolgen.
+### 2. wlan0 konfigurieren 
+ 
+Auf dem Gerät, das mit wlan0 verbunden ist, muss man dann die IP-Adresse des Raspberry Pi auf wlan0 als Standard-Gateway festlegen. Dies kann in den Netzwerkeinstellungen des Geräts erfolgen.
 
 Sobald diese Schritte abgeschlossen sind, sollte das Gerät auf wlan0 in der Lage sein, über den Raspberry Pi auf das Netzwerk auf eth0 zuzugreifen.
 
@@ -133,9 +154,11 @@ Ohne NAT (Network Address Translation) oder PAT (Port Address Translation) könn
 
 In Ihrem Fall ist der Raspberry Pi das Gateway zwischen dem lokalen Netzwerk und dem RPiNet. Ohne NAT oder PAT auf dem Raspberry Pi können Geräte im lokalen Netzwerk nicht direkt mit Geräten im RPiNet kommunizieren. Durch die Konfiguration von NAT oder PAT auf dem Raspberry Pi wird der Verkehr von einem privaten Netzwerk zum anderen umgeschrieben, so dass die Kommunikation möglich wird.
 
+### 3. NAT bzw. PAT setup
+
 Man kann dieses Problem lösen, indem man mit NAT beziehungsweise mit PAT arbeitet.
 
-3. Dazu muss man die iptables-Regeln auf dem Raspberry Pi konfigurierern, um den Verkehr von wlan0 (lokales Netzwerk) zu eth0 (RPiNet) zu NATen (PATen):
+Dazu muss man die iptables-Regeln auf dem Raspberry Pi konfigurierern, um den Verkehr von wlan0 (lokales Netzwerk) zu eth0 (RPiNet) zu NATen (PATen):
 
 ```bash
 sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
@@ -151,7 +174,8 @@ Nachdem diese Schritte abgeschlossen wurden, sollte der Laptop im lokalen Netzwe
 
 ---
 ## NAT 
-Über NAT (nicht PAT) wird nun den privaten IPs (RPi und Laptop) jeweils eine weitere öffentliche IP "zugeteilt". Diese IPs haben den Prefix y.0.0.0/24 (y = 10 + ID der Gruppe).
+
+>Über NAT (nicht PAT) wird nun den privaten IPs (RPi und Laptop) jeweils eine weitere öffentliche IP "zugeteilt". Diese IPs haben den Prefix y.0.0.0/24 (y = 10 + ID der Gruppe).
 Versucht nun erneut, vom internen Netz aus die Webseite der anderen Gruppen zu erreichen. Wieder werdet ihr merken, dass es nicht auf Anhieb funktioniert - denkt an die Rückroute der Pakete! Testet und dokumentiert. Versucht, sowohl statisches als auch dynamisches NAT zu konfigurieren!
 
 Dazu muss man wie im obigen Problem auch schon erläutert die iptables-Regeln auf dem Raspberry Pi konfigurieren und NAT hinzufügen. 
@@ -180,18 +204,19 @@ Konfiguriert nun in eurem privaten Netz (auf dem privaten Interface des RPi oder
 Um einen FTP-Dienst in einem privaten Netzwerk zu konfigurieren und ihn ausschließlich über eine öffentliche Gruppen-IP erreichbar zu machen, kann man die folgenden Schritte ausführen:
 
 1. Installation einens FTP-Servers auf dem Raspberry Pi oder dem Laptop im privaten Netzwerk: 
-`sudo apt-get install vsftpd`
+    
+    `sudo apt-get install vsftpd`
 
 2. Konfiguration des FTP-Servers gemäß den Anforderungen. Die Konfigurationsdatei für vsftpd befindet sich unter:  `/etc/vsftpd.conf`
 
-Es muss sichergestellt werden, dass der FTP-Server gestartet ist und ordnungsgemäß funktioniert: 
-`sudo systemctl start vsftpd`
+    Es muss sichergestellt werden, dass der FTP-Server gestartet ist und ordnungsgemäß funktioniert: 
+    `sudo systemctl start vsftpd`
 
 3. Dann muss man die iptables-Regeln auf dem Raspberry Pi konfigurieren, um den FTP-Verkehr von der öffentlichen Gruppen-IP (y.0.0.0/24) zur privaten IP-Adresse umzuleiten:
 
-```bash
-sudo iptables -t nat -A PREROUTING -p tcp -d y.0.0.0/24 --dport 21 -j DNAT --to-destination 192.168.1.x:21
-```
+    ```bash
+    sudo iptables -t nat -A PREROUTING -p tcp -d y.0.0.0/24 --dport 21 -j DNAT --to-destination 192.168.1.x:21
+    ```
 
 Dabei ist y 10 + ID der Gruppe und x die IP-Adresse des Geräts im privaten Netzwerk, auf dem der FTP-Server ausgeführt wird.
 
