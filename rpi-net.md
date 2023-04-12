@@ -16,7 +16,7 @@ iface eth0 inet static
     broadcast 10.0.0.255
 ```
 
-Dabei muss geschaut werden, dass der networking.service läuft und der dhcpcd.service nicht die IP-Adressen überschreibt. Mit dem Command `ip a` kann man nachschauen, ob die IP-Adresse richtig vergeben wurde und ob das Interface auch aktiv ist.  
+Dabei muss geschaut werden, dass der ==networking.service== läuft und der dhcpcd.service nicht die IP-Adressen überschreibt. Mit dem Command `ip a` kann man nachschauen, ob die IP-Adresse richtig vergeben wurde und ob das Interface auch aktiv ist.  
 
 Es ist jedoch wichtig zu beachten, dass diese Methode für neuere Versionen von Debian/Raspbian (ab Version 9 Stretch) nicht mehr empfohlen wird. Stattdessen wird das Programm dhcpcd verwendet, um eine statische IP-Adresse zu konfigurieren. Weitere Informationen dazu finden Sie in der offiziellen Dokumentation von Raspbian: https://www.raspberrypi.org/documentation/configuration/tcpip/, dies ist auch in der verwendeten Version möglich. 
 
