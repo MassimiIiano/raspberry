@@ -1,0 +1,129 @@
+# Dokumentation Laborübung  VPN
+
+## Aufgabenstellung
+Erstellen Sie mit Hilfe der freien Software WireGuard eine verschlüsselte Verbindung über ein virtuelles privates Netzwerk (VPN) zwischen dem Raspberry (Server) und eurem Laptop (Peer). Eine VPN-Verbindung wird einfach durch den Austausch öffentlicher Schlüssel hergestellt, genau wie beim Austausch von SSH-Schlüsseln. Zuerst muss das Softwarepaket wireguard auf dem beiden Maschinen installliert werden. Konfigurieren Sie dann die Netzwerkinterfaces, die Schlüsselpaare, die Firewallregeln und die Konfigurationsdateien angemessen. Verwende dazu die bereitgestellten Kommandozeilenprogramme wg und wg-quick. Automatisieren Sie schlussendlich das Erstellen des VPN-Tunnels mit einem systemd-Dienst.
+
+## Installation von WireGuard
+
+`sudo apt-get update && sudo apt-get upgrade`
+
+`sudo apt-get install wireguard`
+
+## Konfiguration der Netzwerkinterfaces
+
+RPi
+`sudo vim /etc/wireguard/wg0.conf`
+
+```bash
+[Interface]
+Address = 10.216.220.213/24
+SaveConfig = true
+PrivateKey = <privater Schlüssel des Raspberry Pi>
+
+[Peer]
+PublicKey = <öffentlicher Schlüssel des Laptops>
+AllowedIPs = 172.16.1.2:51820
+```
+
+### Generierung der Schlüsselpaare (RPi)
+```bash
+wg genkey | sudo tee /etc/wireguard/priv.key | wg pubkey | sudo tee /etc/wireguard/pub.key
+```
+
+Laptop
+`sudo vim /etc/wireguard/wg0.conf`
+
+```bash
+[Interface]
+Address = 172.16.1.2/24
+SaveConfig = true
+PrivateKey = <privater Schlüssel des Laptops>
+
+[Peer]
+PublicKey = <öffentlicher Schlüssel des Raspberry Pi>
+AllowedIPs = 10.216.220.213:51820
+Endpoint = <öffentliche IP-Adresse des Raspberry Pi>:<WireGuard-Port des Raspberry Pi>
+```
+
+### Generierung der Schlüsselpaare (Laptop)
+```bash
+wg genkey | sudo tee /etc/wireguard/priv.key | wg pubkey | sudo tee /etc/wireguard/pub.key
+```
+
+## Konfiguration der Firewallregeln
+
+`sudo vim /etc/sysctl.conf`
+
+auskommentieren:
+```bash
+net.ipv4.ip_forward 
+```
+
+`sudo sysctl -p`
+
+Datenverkehr über WireGuard erlauben mit iptables??
+```bash
+# this lets you accept traffic from the VPN interface
+sudo iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+
+# this lets you accept traffic to the VPN interface
+sudo iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+
+# this lets you forward traffic from the VPN interface
+sudo iptables -A INPUT -p udp -m udp --dport 51820 -m conntrack --ctstate NEW -j ACCEPT
+
+# this lets you forward traffic to the VPN interface
+sudo iptables -A FORWARD -i wg0 -o wg0 -m conntrack --ctstate NEW -j ACCEPT
+
+# this masquerades (NAT) traffic from the VPN interface
+sudo iptables -t nat -A POSTROUTING -s 
+```
+
+## Konfigurationsdateien übertragen
+
+`sudo wg-quick up wg0`
+
+`sudo wg-quick down wg0`
+
+## Automatisierung mit systemd-Dienst
+
+`sudo vim /etc/systemd/system/wg-quick@wg0.service`
+
+```bash
+[Unit]
+Description=WireGuard VPN tunnel via wg-quick(8) for %i
+After=network-online.target nss-lookup.target
+Wants=network-online.target nss-lookup.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/wg-quick up %i
+ExecStop=/usr/bin/wg-quick down %i
+
+[Install]
+WantedBy=multi-user.target
+```
+
+`sudo systemctl start wg-quick@wg0.service`
+
+`sudo systemctl status wg-quick@wg0.service`
+
+für start nach neustart
+`sudo systemctl enable wg-quick@wg0.service`
+
+## Testen der VPN-Verbindung
+
+`sudo wg`
+
+`sudo wg show`
+
+`sudo wg showconf wg0`
+
+`sudo wg-quick down wg0`
+
+`sudo wg-quick up wg0`
+
+## Referenzen
+- https://www.wireguard.com/
+- https://www.wireguard.com/quickstart/
